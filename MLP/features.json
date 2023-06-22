@@ -9,5 +9,5 @@
                                 "txp", "txt", "xint", "prcc_f"],
 
     "financial_ratios_14": ["dch_wc", "ch_rsst", "dch_rec", "dch_inv", "soft_assets", "ch_cs", "ch_cm", "ch_roa", "bm",
-                            "dpi", "reoa", "EBIT", "ch_fcf"]
+                            "dpi", "reoa", "EBIT", "ch_fcf","issue"]
 }

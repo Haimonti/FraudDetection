@@ -5,7 +5,7 @@ from tabulate import tabulate
 import matplotlib.pyplot as plt
 
 
-def train_model(X_train, y_train, X_test, y_test,inputs = 42,actv_func='relu', hidden_lay_neu=100,learning_rate=0.001):
+def train_model(X_train, y_train, X_test, y_test,inputs = 28,actv_func='relu', hidden_lay_neu=100,learning_rate=0.001):
     """
     Trains a MLPClassifier model on the training data and evaluates its performance on the test data.
 
