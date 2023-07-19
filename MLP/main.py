@@ -1,5 +1,6 @@
 # Import Libraries
 from utils import datasets, train_model,plot_table,plot_graph
+from ensemble_rusboost import ensemble
 import json
 import pandas as pd
 from imblearn.under_sampling import RandomUnderSampler
@@ -47,4 +48,5 @@ if __name__ == "__main__":
 
     # plot_table(50,learning_rates,actv_funs,X_train_resampled,y_train_resampled,X_test,y_test)
     # plot_graph(100,learning_rates,actv_funs,X_train,y_train,X_test,y_test)
-    train_model(X_train_resampled, y_train_resampled, X_test, y_test,inputs = 42,actv_func='relu', hidden_lay_neu=100,learning_rate=0.001)
+    # train_model(X_train_resampled, y_train_resampled, X_test, y_test,inputs = 42,actv_func='relu', hidden_lay_neu=100,learning_rate=0.001)
+    print(ensemble(X_train_resampled, y_train_resampled, X_test, y_test))
