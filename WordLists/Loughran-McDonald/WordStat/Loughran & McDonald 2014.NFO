@@ -1,0 +1,29 @@
+[PROTECTION]
+Stemming=0
+Exclusion List=0
+Include Level=0
+Overlap=0
+Category only=0
+Exclude word=0
+Process numeric=1
+Valid char=1
+Case sensitive=1
+Exclusion=1
+Inclusion=0
+[DESCRIPTION]
+Show=1
+Version=4
+TEXT=For more information on the Loughran and McDonald Financial Sentiment ^pDictionaries see:^p^pLoughran, T. & McDonald, B. (2011). “When is a Liability not a Liability?  Textual ^pAnalysis, Dictionaries, and 10-Ks,” Journal of Finance, 66:1, 35-65.^p^pBodnaruk, A., Loughran. T, & McDonald, B. (2015). “Using 10-K Text to Gauge Financial ^pConstraints,” Journal of Financial and Quantitative Analysis, 50:4.^p^por visit this web site:^p^phttp://www3.nd.edu/~mcdonald/Word_Lists.html^p^pNot for commercial use without authorization. Copyright © 2009-2014
+[WordStat]
+Level=2
+Stemming=0
+Stemming type=Allemand
+Exclusion=0
+Exclusion List=C:\Users\Normand\Documents\My Provalis Research Projects\Dict\English.exc
+Last Category=1
+Process Numeric=0
+Exclude Category Names=1
+Characters=
+ECharacters=
+Case sensitive=0
+Overlap=0

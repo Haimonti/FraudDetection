@@ -1,0 +1,13 @@
+{
+    "28 Raw Financial Items + 14 Financial Ratios": ["act", "ap", "at", "ceq", "che", "cogs", "csho", "dlc", "dltis", "dltt", "dp", "ib", "invt",
+                "ivao", "ivst", "lct", "lt", "ni", "ppegt", "pstk", "re", "rect","sale", "sstk", "txp", "txt",
+                "xint", "prcc_f", "dch_wc", "ch_rsst", "dch_rec", "dch_inv","soft_assets", "ch_cs", "ch_cm",
+                 "ch_roa", "bm", "dpi", "reoa", "EBIT", "ch_fcf","issue"],
+
+    "28 Raw Financial Items": ["act", "ap", "at", "ceq", "che", "cogs", "csho", "dlc", "dltis", "dltt", "dp", "ib",
+                                "invt", "ivao", "ivst", "lct", "lt", "ni", "ppegt", "pstk", "re", "rect","sale", "sstk",
+                                "txp", "txt", "xint", "prcc_f"],
+
+    "14 Financial Ratios": ["dch_wc", "ch_rsst", "dch_rec", "dch_inv", "soft_assets", "ch_cs", "ch_cm", "ch_roa", "bm",
+                            "dpi", "reoa", "EBIT", "ch_fcf","issue"]
+}
