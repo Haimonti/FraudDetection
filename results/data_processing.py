@@ -43,16 +43,16 @@ class DataProcessor:
             test_batches: List of DataFrames representing test data batches.
         """
         train_batches, test_batches = [], []
-        train_start, train_end = self.train_period[0], self.train_period[0] + self.window_size
-        test_start, test_end = self.test_period[0], self.test_period[0] + self.window_size
-
+        train_start = 1990
+        train_end = train_start+ self.window_size
+        test_start=train_end+1
+        test_end = test_start+self.window_size
         while test_start <= 2023:
             train_batches.append((train_start, train_end))
             test_batches.append((test_start, test_end))
 
-            train_start += self.window_size
-            train_end += self.window_size
-            test_start += self.window_size
+            train_start,train_end = test_start,test_end
+            test_start = test_end+1
             test_end += self.window_size
 
             if test_end > 2023:
