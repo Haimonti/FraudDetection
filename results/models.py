@@ -6,9 +6,13 @@ import xgboost as xgb
 import statsmodels.api as sm
 from sklearn.linear_model import LogisticRegression
 from sklearn.neural_network import MLPClassifier
+from sklearn.model_selection import GridSearchCV, train_test_split
+from sklearn.ensemble import RandomForestClassifier
+
+
 
 # Function to train a Random Under-Sampling Boosting (RUSBoost) classifier
-def rus_boost(X_train, y_train, X_test, y_test):
+def rus_boost(X_train, y_train, X_test, y_test,param_grid=None):
     """
     Trains a RUSBoost classifier on the training data and evaluates its performance on the test data.
 
@@ -41,7 +45,7 @@ def rus_boost(X_train, y_train, X_test, y_test):
 
 
 # Function to train a Support Vector Machine (SVM) classifier
-def svm_model(X_train, y_train, X_test, y_test):
+def svm_model(X_train, y_train, X_test, y_test,param_grid=None):
     """
     Trains an SVM classifier on the training data and evaluates its performance on the test data.
 
@@ -70,30 +74,54 @@ def svm_model(X_train, y_train, X_test, y_test):
 
 
 # Function to train an XGBoost classifier
-def xgb_model(X_train, y_train, X_test, y_test):
+def xgb_model(X_train, y_train, X_test, y_test, param_grid):
     """
-    Trains an XGBoost classifier on the training data and evaluates its performance on the test data.
+    Trains an XGBoost classifier with hyperparameter tuning using grid search on the training data
+    and evaluates its performance on the test data.
 
     Args:
-    - X_train : The training input samples.
-    - y_train : The target values for the training samples.
-    - X_test  : The test input samples.
-    - y_test  : The target values for the test samples.
+    - X_train: The training input samples.
+    - y_train: The target values for the training samples.
+    - X_test: The test input samples.
+    - y_test: The target values for the test samples.
+    - param_grid: A dictionary of hyperparameters for the grid search.
 
     Returns:
     - auc (float): The AUC (Area Under the Curve) score.
     """
-    xgb_clf = xgb.XGBClassifier()
-    xgb_clf.fit(X_train, y_train)
+    xgb_clf = xgb.XGBClassifier(n_estimators=1000, early_stopping_rounds=50, learning_rate=0.01)
+    
+    # Create a GridSearchCV object with the XGBoost classifier and the parameter grid
+    grid_search = GridSearchCV(estimator=xgb_clf, param_grid=param_grid, scoring='roc_auc', cv=5)
+    
+    # Fit the grid search to the training data
+    grid_search.fit(X_train, y_train,
+                    eval_set = [(X_train,y_train),(X_test,y_test)],
+                    verbose=False)
 
-    y_scores = xgb_clf.predict_proba(X_test)[:, 1]
+    # Get the best estimator (model) from the grid search
+    best_xgb_clf = grid_search.best_estimator_
+    
+
+    best_params = grid_search.best_params_
+    best_auc = grid_search.best_score_
+
+    # Predict probabilities on the test set
+    y_scores = best_xgb_clf.predict_proba(X_test)[:, 1]
+
+    # Print the best hyperparameters, the corresponding AUC score and test AUC Score
+    print("Best Hyperparameters:", best_params)
+    print("Best AUC Score:", best_auc)
+    
+    # Calculate AUC
     auc = roc_auc_score(y_test, y_scores)
+    print("Test AUC Score:", auc)
 
     return auc
 
 
 # Function to train a logistic regression model
-def logistic_regression_model(X_train, y_train, X_test, y_test):
+def logistic_regression_model(X_train, y_train, X_test, y_test,param_grid=None):
     """
     Trains a logistic regression model on the training data and evaluates its performance on the test data.
 
@@ -116,7 +144,7 @@ def logistic_regression_model(X_train, y_train, X_test, y_test):
 
 
 # Function to train a probit regression model
-def probit_regression_model(X_train, y_train, X_test, y_test):
+def probit_regression_model(X_train, y_train, X_test, y_test,param_grid=None):
     """
     Trains a probit regression model on the training data and evaluates its performance on the test data.
 
@@ -163,12 +191,13 @@ def MLP(X_train, y_train, X_test, y_test,inputs = 28,actv_func='logistic', hidde
     - cm_params (tuple): A tuple containing the confusion matrix values (TN, FP, FN, TP).
     
     """
-    clf = MLPClassifier(hidden_layer_sizes=(inputs, hidden_lay_neu[0],hidden_lay_neu[1],hidden_lay_neu[2],hidden_lay_neu[3]),
-                        max_iter=1000,
+    clf = MLPClassifier(hidden_layer_sizes=(inputs, *hidden_lay_neu),
+                        max_iter=10000,
                         random_state=42,
                         verbose=False,
                         learning_rate_init=learning_rate,
-                        activation=actv_func)
+                        activation=actv_func
+                        )
 
     # Fit data onto the model
     clf.fit(X_train, y_train)
@@ -177,3 +206,69 @@ def MLP(X_train, y_train, X_test, y_test,inputs = 28,actv_func='logistic', hidde
     auc = roc_auc_score(y_test, ypred)
 
     return auc
+
+
+def mlp_grid_search(X_train, y_train, X_test, y_test, param_grid):
+    """
+    Perform a grid search to find the best hyperparameters for an MLPClassifier model and evaluate its performance.
+
+    Args:
+    - X_train : The training input samples.
+    - y_train : The target values for the training samples.
+    - X_test  : The test input samples.
+    - y_test  : The target values for the test samples.
+    - param_grid (dict): A dictionary containing hyperparameter values to search.
+
+    Returns:
+    - test_auc (float): The Test AUC (Area Under the Curve) score achieved..
+
+    This function uses cross-validated grid search to find the best hyperparameters for an MLPClassifier model
+    and evaluates its performance on the test data.
+    """
+    # Create an MLPClassifier with default values for some hyperparameters
+    mlp_model = MLPClassifier(max_iter=4000, random_state=42, verbose=False)
+
+    # Perform grid search using cross-validation
+    grid_search = GridSearchCV(estimator=mlp_model, param_grid=param_grid, scoring='roc_auc', cv=5)
+    grid_search.fit(X_train, y_train)
+
+    # Get the best hyperparameters and the corresponding AUC score
+    best_params = grid_search.best_params_
+    best_auc = grid_search.best_score_
+    test_auc = grid_search.score(X_test, y_test)
+    # Print the best hyperparameters, the corresponding AUC score and test AUC Score
+    print("Best Hyperparameters:", best_params)
+    print("Best AUC Score:", best_auc)
+    print("Test AUC Score:", test_auc)
+    # Return the test AUC score
+    return test_auc
+
+
+def random_forests(X_train, y_train, X_test, y_test, param_grid):
+    # Define the Random Forest classifier
+    rf_model = RandomForestClassifier(random_state=42)
+
+    # Define the parameter grid to search
+    param_grid = {
+        'n_estimators': [100, 200, 300],  # Number of trees in the forest
+        'max_depth': [None, 10, 20, 30],  # Maximum depth of the tree
+        'min_samples_split': [2, 5, 10],  # Minimum number of samples required to split an internal node
+        'min_samples_leaf': [1, 2, 4]  # Minimum number of samples required to be at a leaf node
+    }
+
+    # Perform grid search using cross-validation
+    grid_search = GridSearchCV(estimator=rf_model, param_grid=param_grid, scoring='roc_auc', cv=5)
+    grid_search.fit(X_train, y_train)
+
+    # Get the best hyperparameters and the corresponding AUC score
+    best_params = grid_search.best_params_
+    best_auc = grid_search.best_score_
+    test_auc = grid_search.score(X_test, y_test)
+
+    # Print the best hyperparameters, the corresponding AUC score, and test AUC Score
+    print("Best Hyperparameters:", best_params)
+    print("Best AUC Score:", best_auc)
+    print("Test AUC Score:", test_auc)
+
+    # Return the test AUC score
+    return test_auc
