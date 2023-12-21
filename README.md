@@ -2,11 +2,17 @@
 
 This project implements different ML model's for fraud detection using financial data. These models are trained on a dataset with 28 raw financial Items, 14 financial ratios and also combining both as input features to predict fraudulent activities.
 
+
 ## Folder Structure
 
 The project has the following folder structure:
 
 - `data/`: A directory containing data files for training and testing the ML model.
+- `results/`: A directory containing Python scripts and files for data processing and model evaluation.
+  - `data_processing.py`: Python script for data processing.
+  - `features.json`: JSON file specifying feature mapping.
+  - `models.py`: Python script for model-related functions.
+  - `utils.py`: Utility functions.
 - `MLP/`: A directory containing the code for the MLP model.
   - `ensemble.py`: A Python script that trains an AdaBoost ensemble classifier using a DecisionTreeClassifier as the base model and evaluates its performance.
   - `features.json`: JSON file specifying the mapping of features in the dataset.
@@ -19,11 +25,7 @@ The project has the following folder structure:
   - `model-tuning.ipynb`: A Jupyter Notebook for exploring different model configurations and tuning hyperparameters.
   - `RusBoost, XgBoost, SVM.ipynb`: A Jupyter Notebook for implementing MLP with different methods and models.
 - `WordLists/`: Folder containing word lists used in different papers.
-- `results/`: A directory containing Python scripts and files for data processing and model evaluation.
-  - `data_processing.py`: Python script for data processing.
-  - `features.json`: JSON file specifying feature mapping.
-  - `models.py`: Python script for model-related functions.
-  - `utils.py`: Utility functions.
 - `README.md`: This README file.
 
 
+Note: This is readme file is not up to date

@@ -33,7 +33,15 @@ def rus_boost(X_train, y_train, X_test, y_test,param_grid=None):
 
     # Fit the RUSBoost classifier on the training data
     rusboost.fit(X_train, y_train)
- 
+    
+    # Make predictions on the training data
+    y_train_pred = rusboost.predict(X_train)
+    y_train_scores = rusboost.decision_function(X_train)
+
+    # Calculate the AUC (Area Under the Curve) score on the training data
+    auc_train = roc_auc_score(y_train, y_train_scores)
+    print("Train AUC:", auc_train)
+
     # Make predictions on the test data
     y_pred = rusboost.predict(X_test)
     y_scores = rusboost.decision_function(X_test)
@@ -63,6 +71,13 @@ def svm_model(X_train, y_train, X_test, y_test,param_grid=None):
 
     # Fit the SVM classifier on the training data
     svc.fit(X_train, y_train)
+
+    # Make predictions on the training data
+    y_train_scores = svc.predict_proba(X_train)[:, 1]
+
+    # Calculate the AUC (Area Under the Curve) score on the training data
+    auc_train = roc_auc_score(y_train, y_train_scores)
+    print("Train AUC:", auc_train)
 
     # Get probability scores and calculate the AUC score to evaluate the model's performance
     y_scores = svc.predict_proba(X_test)[:, 1]
@@ -137,6 +152,13 @@ def logistic_regression_model(X_train, y_train, X_test, y_test,param_grid=None):
     logit_clf = LogisticRegression(solver='liblinear',max_iter=1000) 
     logit_clf.fit(X_train, y_train)
 
+    # Make predictions on the training data
+    y_train_scores = logit_clf.predict_proba(X_train)[:, 1]
+
+    # Calculate the AUC (Area Under the Curve) score on the training data
+    auc_train = roc_auc_score(y_train, y_train_scores)
+    print("Train AUC:", auc_train)
+
     y_scores = logit_clf.predict_proba(X_test)[:, 1]
     auc = roc_auc_score(y_test, y_scores)
 
@@ -165,6 +187,16 @@ def probit_regression_model(X_train, y_train, X_test, y_test,param_grid=None):
     probit_model = sm.Probit(y_train, X_train)
     probit_result = probit_model.fit()
 
+    # print(y_test.isna().sum())
+    # print(X_train.isna().sum())
+    # print(X_test.isna().sum())
+    # Make predictions on the training data
+    # y_train_scores = probit_result.predict(X_train)
+
+    # # Calculate the AUC (Area Under the Curve) score on the training data
+    # auc_train = roc_auc_score(y_train, y_train_scores)
+    # print("Train AUC:", auc_train)
+    
     # Make predictions and calculate the AUC score to evaluate the model's performance
     y_scores = probit_result.predict(X_test)
     auc = roc_auc_score(y_test, y_scores)
@@ -198,7 +230,6 @@ def MLP(X_train, y_train, X_test, y_test,inputs = 28,actv_func='logistic', hidde
                         learning_rate_init=learning_rate,
                         activation=actv_func
                         )
-
     # Fit data onto the model
     clf.fit(X_train, y_train)
     # Make prediction on test dataset
