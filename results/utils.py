@@ -1,22 +1,27 @@
 from imblearn.under_sampling import RandomUnderSampler
+from imblearn.over_sampling import BorderlineSMOTE
 from results.models import MLP, mlp_grid_search
 # Function to evaluate a machine learning model's performance
-def evaluate(item, train_data, test_data, model_name,param_grid=None):
+def evaluate(item, train_data, test_data, model_name,param_grid=None,sample='under'):
     """
     Args:
     - item: A specific item (feature) to be used for evaluation.
     - train_data: Training data containing features and target variable.
     - test_data: Test data containing features and target variable.
     - model_name: A function representing the machine learning model to be evaluated.
-
+    - param_grid: parameter grid for grid search tuning
+    - sample: under for undersampling, over for oversampling
     Returns:
     - If test data is empty, returns "Done."
     - Otherwise, returns the results of the machine learning model on resampled data.
     """
     X_train, y_train = train_data[item], train_data['misstate']
     X_test, y_test = test_data[item], test_data['misstate']
-    rus = RandomUnderSampler(random_state=42)
-    X_train_resampled, y_train_resampled = rus.fit_resample(X_train, y_train)
+    if sample == 'under':
+        rus = RandomUnderSampler(random_state=42)
+        X_train_resampled, y_train_resampled = rus.fit_resample(X_train, y_train)
+    elif sample == 'over':
+        X_train_resampled, y_train_resampled = BorderlineSMOTE().fit_resample(X_train, y_train)
     if X_test.shape[0] == 0:
         return "Done"
     if model_name == MLP:
@@ -46,7 +51,7 @@ def null_check(item, train_data, val_data, test_data):
     return train_data, val_data, test_data
 
 # Function to process and evaluate model results
-def results(obj, train_period, test_period, item, model_name,param_grid=None):
+def results(obj, train_period, test_period, item, model_name,param_grid=None,sample='under'):
     """
     Args:
     - obj: An object containing data and methods to split data into training, validation, and test sets.
@@ -60,5 +65,5 @@ def results(obj, train_period, test_period, item, model_name,param_grid=None):
     """
     train_data, validation_data, test_data = obj.split_data_periods(train_period, test_period)
     train_data, validation_data, test_data = null_check(item, train_data, validation_data, test_data)
-    return evaluate(item, train_data, test_data, model_name,param_grid)
+    return evaluate(item, train_data, test_data, model_name,param_grid,sample)
 

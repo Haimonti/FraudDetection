@@ -40,7 +40,7 @@ def rus_boost(X_train, y_train, X_test, y_test,param_grid=None):
 
     # Calculate the AUC (Area Under the Curve) score on the training data
     auc_train = roc_auc_score(y_train, y_train_scores)
-    print("Train AUC:", auc_train)
+    # print("Train AUC:", auc_train)
 
     # Make predictions on the test data
     y_pred = rusboost.predict(X_test)
@@ -77,7 +77,7 @@ def svm_model(X_train, y_train, X_test, y_test,param_grid=None):
 
     # Calculate the AUC (Area Under the Curve) score on the training data
     auc_train = roc_auc_score(y_train, y_train_scores)
-    print("Train AUC:", auc_train)
+    # print("Train AUC:", auc_train)
 
     # Get probability scores and calculate the AUC score to evaluate the model's performance
     y_scores = svc.predict_proba(X_test)[:, 1]
@@ -89,7 +89,7 @@ def svm_model(X_train, y_train, X_test, y_test,param_grid=None):
 
 
 # Function to train an XGBoost classifier
-def xgb_model(X_train, y_train, X_test, y_test, param_grid):
+def xgb_model(X_train, y_train, X_test, y_test, param_grid =None):
     """
     Trains an XGBoost classifier with hyperparameter tuning using grid search on the training data
     and evaluates its performance on the test data.
@@ -107,30 +107,42 @@ def xgb_model(X_train, y_train, X_test, y_test, param_grid):
     xgb_clf = xgb.XGBClassifier(n_estimators=1000, early_stopping_rounds=50, learning_rate=0.01)
     
     # Create a GridSearchCV object with the XGBoost classifier and the parameter grid
-    grid_search = GridSearchCV(estimator=xgb_clf, param_grid=param_grid, scoring='roc_auc', cv=5)
-    
-    # Fit the grid search to the training data
-    grid_search.fit(X_train, y_train,
-                    eval_set = [(X_train,y_train),(X_test,y_test)],
-                    verbose=False)
+    if param_grid:
+        grid_search = GridSearchCV(estimator=xgb_clf, param_grid=param_grid, scoring='roc_auc', cv=5)
+        
+        # Fit the grid search to the training data
+        grid_search.fit(X_train, y_train,
+                        eval_set = [(X_train,y_train),(X_test,y_test)],
+                        verbose=False)
 
-    # Get the best estimator (model) from the grid search
-    best_xgb_clf = grid_search.best_estimator_
-    
+        # Get the best estimator (model) from the grid search
+        best_xgb_clf = grid_search.best_estimator_
+        
 
-    best_params = grid_search.best_params_
-    best_auc = grid_search.best_score_
+        best_params = grid_search.best_params_
+        best_auc = grid_search.best_score_
 
-    # Predict probabilities on the test set
-    y_scores = best_xgb_clf.predict_proba(X_test)[:, 1]
+        # Predict probabilities on the test set
+        y_scores = best_xgb_clf.predict_proba(X_test)[:, 1]
 
-    # Print the best hyperparameters, the corresponding AUC score and test AUC Score
-    print("Best Hyperparameters:", best_params)
-    print("Best AUC Score:", best_auc)
-    
-    # Calculate AUC
-    auc = roc_auc_score(y_test, y_scores)
-    print("Test AUC Score:", auc)
+        # Print the best hyperparameters, the corresponding AUC score and test AUC Score
+        print("Best Hyperparameters:", best_params)
+        print("Best AUC Score:", best_auc)
+        
+        # Calculate AUC
+        auc = roc_auc_score(y_test, y_scores)
+        print("Test AUC Score:", auc)
+    else:
+        # Predict probabilities on the test set
+        xgb_clf.fit(X_train, y_train,
+                        eval_set = [(X_train,y_train),(X_test,y_test)],
+                        verbose=False)
+        y_scores = xgb_clf.predict_proba(X_test)[:, 1]
+
+        
+        # Calculate AUC
+        auc = roc_auc_score(y_test, y_scores)
+        print("Test AUC Score:", auc)
 
     return auc
 
@@ -157,7 +169,7 @@ def logistic_regression_model(X_train, y_train, X_test, y_test,param_grid=None):
 
     # Calculate the AUC (Area Under the Curve) score on the training data
     auc_train = roc_auc_score(y_train, y_train_scores)
-    print("Train AUC:", auc_train)
+    # print("Train AUC:", auc_train)
 
     y_scores = logit_clf.predict_proba(X_test)[:, 1]
     auc = roc_auc_score(y_test, y_scores)

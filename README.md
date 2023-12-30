@@ -28,4 +28,4 @@ The project has the following folder structure:
 - `README.md`: This README file.
 
 
-Note: This is readme file is not up to date
+**Note:** This is readme file is not up to date
