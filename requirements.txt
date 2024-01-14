@@ -11,7 +11,6 @@ packaging==23.1
 pandas==2.0.2
 Pillow==9.5.0
 pyparsing==3.0.9
-pyspark==3.3.2
 python-dateutil==2.8.2
 pytz==2023.3
 scikit-learn==1.2.2

@@ -1,6 +1,9 @@
 from imblearn.under_sampling import RandomUnderSampler
 from imblearn.over_sampling import BorderlineSMOTE
 from results.models import MLP, mlp_grid_search
+import pandas as pd
+from sklearn.utils import shuffle
+
 # Function to evaluate a machine learning model's performance
 def evaluate(item, train_data, test_data, model_name,param_grid=None,sample='under'):
     """
@@ -10,7 +13,7 @@ def evaluate(item, train_data, test_data, model_name,param_grid=None,sample='und
     - test_data: Test data containing features and target variable.
     - model_name: A function representing the machine learning model to be evaluated.
     - param_grid: parameter grid for grid search tuning
-    - sample: under for undersampling, over for oversampling
+    - sample: under for undersampling, over for oversampling, over_under for percentage over sampling and then undersampling
     Returns:
     - If test data is empty, returns "Done."
     - Otherwise, returns the results of the machine learning model on resampled data.
@@ -21,12 +24,29 @@ def evaluate(item, train_data, test_data, model_name,param_grid=None,sample='und
         rus = RandomUnderSampler(random_state=42)
         X_train_resampled, y_train_resampled = rus.fit_resample(X_train, y_train)
     elif sample == 'over':
-        X_train_resampled, y_train_resampled = BorderlineSMOTE().fit_resample(X_train, y_train)
+        X_train_resampled, y_train_resampled = BorderlineSMOTE(random_state=42).fit_resample(X_train, y_train)
+    elif sample == 'over_under':
+        X_train_resampled, y_train_resampled = BorderlineSMOTE(sampling_strategy=0.1, random_state=42).fit_resample(X_train, y_train)
+        X_train_resampled, y_train_resampled = RandomUnderSampler(random_state=42).fit_resample(X_train_resampled, y_train_resampled)
+    import statsmodels.api as sm
+
+    # Combine X_train_resampled and y_train_resampled into a single DataFrame
+    combined_data = pd.concat([pd.DataFrame(X_train_resampled), pd.DataFrame(y_train_resampled, columns=['misstate'])], axis=1)
+
+    # Shuffle the combined DataFrame
+    shuffled_data = shuffle(combined_data, random_state=42)
+
+    # Separate the shuffled data back into features (X_train_shuffled) and labels (y_train_shuffled)
+    X_train_shuffled = shuffled_data.drop(columns=['misstate'])
+    y_train_shuffled = shuffled_data['misstate']
+
     if X_test.shape[0] == 0:
         return "Done"
+    print("Train Shape: ",X_train_shuffled.shape, y_train_shuffled.shape)
+    print("Test Shape: ",X_test.shape, y_test.shape)
     if model_name == MLP:
-        return model_name(X_train_resampled, y_train_resampled, X_test, y_test,inputs = len(item),actv_func='logistic', hidden_lay_neu=(40,50,60,40),learning_rate=0.005)
-    return model_name(X_train_resampled, y_train_resampled, X_test, y_test,param_grid)
+        return model_name(X_train_shuffled, y_train_shuffled, X_test, y_test,inputs = len(item),actv_func='logistic', hidden_lay_neu=(40,50,60,40),learning_rate=0.005)
+    return model_name(X_train_shuffled, y_train_shuffled, X_test, y_test,param_grid)
 
 # Function to remove rows with missing values in a specific item (feature)
 def null_check(item, train_data, val_data, test_data):

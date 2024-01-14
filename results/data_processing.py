@@ -39,23 +39,18 @@ class DataProcessor:
         Create batches of training and test data using a sliding window approach.
 
         Returns:
-            train_batches: List of DataFrames representing training data batches.
-            test_batches: List of DataFrames representing test data batches.
+            train_batches: List of tuples representing training data batches.
+            test_batches: List of tuples representing test data batches.
         """
         train_batches, test_batches = [], []
-        train_start = 1990
-        train_end = train_start+ self.window_size
-        test_start=train_end+1
-        test_end = test_start+self.window_size
-        while test_start <= 2023:
-            train_batches.append((train_start, train_end))
-            test_batches.append((test_start, test_end))
+        start_year = 1990
+        end_year = start_year + self.window_size
+        while end_year <= 2023:
+            train_batches.append((start_year, end_year - 1))
+            test_batches.append((end_year, end_year + self.window_size - 1))
 
-            train_start,train_end = test_start,test_end
-            test_start = test_end+1
-            test_end += self.window_size
-
-            if test_end > 2023:
-                test_end = 2023  # Ensure the test period doesn't exceed the maximum year.
+            start_year += 5  # Increment the start year by 5 years
+            end_year = start_year + self.window_size
 
         return train_batches, test_batches
+

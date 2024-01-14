@@ -192,28 +192,31 @@ def probit_regression_model(X_train, y_train, X_test, y_test,param_grid=None):
     - auc (float): The AUC (Area Under the Curve) score.
     """
     # Add a constant term to the input features for the probit model
-    X_train = sm.add_constant(X_train)
-    X_test = sm.add_constant(X_test)
+    try:
+        X_train = sm.add_constant(X_train)
+        X_test = sm.add_constant(X_test)
 
-    # Create a probit model and fit it to the training data
-    probit_model = sm.Probit(y_train, X_train)
-    probit_result = probit_model.fit()
+        # Create a probit model and fit it to the training data
+        probit_model = sm.Probit(y_train, X_train)
+        probit_result = probit_model.fit()
 
-    # print(y_test.isna().sum())
-    # print(X_train.isna().sum())
-    # print(X_test.isna().sum())
-    # Make predictions on the training data
-    # y_train_scores = probit_result.predict(X_train)
+        # print(y_test.isna().sum())
+        # print(X_train.isna().sum())
+        # print(X_test.isna().sum())
+        # Make predictions on the training data
+        # y_train_scores = probit_result.predict(X_train)
 
-    # # Calculate the AUC (Area Under the Curve) score on the training data
-    # auc_train = roc_auc_score(y_train, y_train_scores)
-    # print("Train AUC:", auc_train)
-    
-    # Make predictions and calculate the AUC score to evaluate the model's performance
-    y_scores = probit_result.predict(X_test)
-    auc = roc_auc_score(y_test, y_scores)
+        # # Calculate the AUC (Area Under the Curve) score on the training data
+        # auc_train = roc_auc_score(y_train, y_train_scores)
+        # print("Train AUC:", auc_train)
+        
+        # Make predictions and calculate the AUC score to evaluate the model's performance
+        y_scores = probit_result.predict(X_test)
+        auc = roc_auc_score(y_test, y_scores)
 
-    return auc
+        return auc
+    except:
+        return None
 
 
 def MLP(X_train, y_train, X_test, y_test,inputs = 28,actv_func='logistic', hidden_lay_neu=(40,50,60,40),learning_rate=0.001):
@@ -288,30 +291,41 @@ def mlp_grid_search(X_train, y_train, X_test, y_test, param_grid):
 
 
 def random_forests(X_train, y_train, X_test, y_test, param_grid):
-    # Define the Random Forest classifier
-    rf_model = RandomForestClassifier(random_state=42)
 
     # Define the parameter grid to search
-    param_grid = {
-        'n_estimators': [100, 200, 300],  # Number of trees in the forest
-        'max_depth': [None, 10, 20, 30],  # Maximum depth of the tree
-        'min_samples_split': [2, 5, 10],  # Minimum number of samples required to split an internal node
-        'min_samples_leaf': [1, 2, 4]  # Minimum number of samples required to be at a leaf node
-    }
+    # param_grid = {
+    #     'n_estimators': [100, 200, 300],  # Number of trees in the forest
+    #     'max_depth': [None, 10, 20, 30],  # Maximum depth of the tree
+    #     'min_samples_split': [2, 5, 10],  # Minimum number of samples required to split an internal node
+    #     'min_samples_leaf': [1, 2, 4]  # Minimum number of samples required to be at a leaf node
+    # }
+    if param_grid:
+        rf_model = RandomForestClassifier(random_state=42)
+        # Perform grid search using cross-validation
+        grid_search = GridSearchCV(estimator=rf_model, param_grid=param_grid, scoring='roc_auc', cv=5)
+        grid_search.fit(X_train, y_train)
 
-    # Perform grid search using cross-validation
-    grid_search = GridSearchCV(estimator=rf_model, param_grid=param_grid, scoring='roc_auc', cv=5)
-    grid_search.fit(X_train, y_train)
+        # Get the best hyperparameters and the corresponding AUC score
+        best_params = grid_search.best_params_
+        best_auc = grid_search.best_score_
+        test_auc = grid_search.score(X_test, y_test)
 
-    # Get the best hyperparameters and the corresponding AUC score
-    best_params = grid_search.best_params_
-    best_auc = grid_search.best_score_
-    test_auc = grid_search.score(X_test, y_test)
+        # Print the best hyperparameters, the corresponding AUC score, and test AUC Score
+        print("Best Hyperparameters:", best_params)
+        print("Best AUC Score:", best_auc)
+        print("Test AUC Score:", test_auc)
+    else:
+        rf_clf = RandomForestClassifier(n_estimators=100, random_state=42) 
 
-    # Print the best hyperparameters, the corresponding AUC score, and test AUC Score
-    print("Best Hyperparameters:", best_params)
-    print("Best AUC Score:", best_auc)
-    print("Test AUC Score:", test_auc)
+        # Train the Random Forest classifier on your training data
+        rf_clf.fit(X_train, y_train)
+
+        # Make predictions on the test data
+        y_scores_rf = rf_clf.predict_proba(X_test)[:, 1]
+
+        # Calculate AUC for Random Forest
+        test_auc = roc_auc_score(y_test, y_scores_rf)
+        print("Random Forest Test AUC Score:", test_auc)
 
     # Return the test AUC score
     return test_auc
