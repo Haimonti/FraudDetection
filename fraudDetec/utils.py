@@ -1,6 +1,6 @@
 from imblearn.under_sampling import RandomUnderSampler
 from imblearn.over_sampling import BorderlineSMOTE
-from results.models import MLP, mlp_grid_search
+from fraudDetec.models import MLP, mlp_grid_search
 import pandas as pd
 from sklearn.utils import shuffle
 
