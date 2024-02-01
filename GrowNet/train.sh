@@ -33,5 +33,5 @@ CUDA_VISIBLE_DEVICES=0 python -u main_cls_cv.py \
     --normalization True \
     --cv False \
     --sparse False \
-    --out_f ${OUTDIR}/${dataset}_cls.pth \
-    --cuda
+    --out_f ${OUTDIR}/${dataset}_cls.pth 
+#    --cuda
