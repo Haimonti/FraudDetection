@@ -48,7 +48,7 @@ if not opt.cuda:
 # prepare the dataset
 def get_data():
    
-    data = pd.read_csv('data_/merged_compustat_and_labels.csv')
+    data = pd.read_csv('data/merged_compustat_and_labels.csv')
     with open('data_/features.json') as json_file:
         data_items = json.load(json_file)
 
